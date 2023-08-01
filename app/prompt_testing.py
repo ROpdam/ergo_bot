@@ -1,6 +1,6 @@
 from langchain.schema import Document
 
-test_response = res = {
+test_response = {
     "query": "Health benefits of green tea",
     "result": "Green tea has been found to have several health benefits. According to studies, drinking green tea can reduce the risk of developing complaints that limit the ability to function independently in elderly individuals. It has also been shown to reduce the chance of fatal pneumonia, psychological stress, and depression. Green tea consumption has been associated with longer lifespan and a reduced chance of some form of disability. Additionally, research on lab mice has shown that replacing drinking water with green tea can lead to a longer lifespan and potentially help repair defects in the immune system. However, the exact mechanisms behind these benefits are not fully understood and further clinical trials are needed to confirm the protective effects of green tea.",
     "source_documents": [
