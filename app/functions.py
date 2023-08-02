@@ -2,9 +2,11 @@ from typing import Union
 
 import chainlit as cl
 from dotenv import load_dotenv
-from langchain.chains import RetrievalQA  # RetrievalQAWithSourcesChain
+from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+
+# from langchain.embeddings import OpenAIEmbeddings
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
@@ -43,9 +45,11 @@ db_persist_directory = "ergologs_data/db"
 load_dotenv()
 
 # OpenAI embeddings
-embedding = OpenAIEmbeddings()
+embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-vectordb = Chroma(persist_directory=db_persist_directory, embedding_function=embedding)
+vectordb = Chroma(
+    persist_directory=db_persist_directory, embedding_function=embedding_function
+)
 retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": k})
 
 qa_chain = RetrievalQA.from_chain_type(

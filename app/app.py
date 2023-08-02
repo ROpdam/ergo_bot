@@ -7,7 +7,9 @@ from functions import format_response, qa_chain
 @cl.on_chat_start
 async def init():
     """"""
-    await cl.Message(content="Hi! I am the Ergolog chatbot how can I help?").send()
+    await cl.Message(
+        content="Hi! I am the [Ergolog](https://www.ergo-log.com/) chatbot how can I help?"
+    ).send()
 
     cl.user_session.set("chain", qa_chain)
 
@@ -25,4 +27,5 @@ async def main(message: str):
         elements=response["article_links"],
         indent=1,
     ).send()
+
     await cl.Message(content=response["answer"], indent=0).send()
