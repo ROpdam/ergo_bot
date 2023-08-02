@@ -2,7 +2,7 @@ from typing import Union
 
 import chainlit as cl
 from dotenv import load_dotenv
-from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.chains import RetrievalQA  # RetrievalQAWithSourcesChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.prompts.chat import (
@@ -46,39 +46,16 @@ load_dotenv()
 embedding = OpenAIEmbeddings()
 
 vectordb = Chroma(persist_directory=db_persist_directory, embedding_function=embedding)
-retriever = vectordb.as_retriever(search_kwargs={"k": k})
+retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": k})
 
-qa_chain = RetrievalQAWithSourcesChain.from_chain_type(
-    ChatOpenAI(temperature=0, streaming=True, model_name="gpt-3.5-turbo"),
+qa_chain = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"),
     chain_type="stuff",
     retriever=retriever,
+    return_source_documents=True,
+    verbose=False,
+    # chain_type_kwargs=chain_type_kwargs
 )
-
-# RetrievalQA.from_chain_type(
-#     llm=ChatOpenAI(temperature=0, model_name='gpt-3.5-turbo'),
-#     # FakeListLLM(
-#     #     responses=test_response
-#     # ),
-#     chain_type="stuff",
-#     retriever=retriever,
-#     return_source_documents=True,
-#     verbose=True,
-#     chain_type_kwargs=chain_type_kwargs
-# )
-
-
-def get_doc_content(docs: list) -> Union[list, list]:
-    """"""
-    doc_names = "Sources: "
-    doc_contents = []
-    for idx, doc in enumerate(docs):
-        doc_name = f" Document {idx+1} "
-        doc_names += doc_name
-        content = doc.page_content + "\nlink:" + doc.metadata["article_link"] + "\n"
-
-        doc_contents.append(cl.Text(content=content, name=doc_name))
-
-    return doc_names, doc_contents
 
 
 def get_article_links(docs: list) -> Union[list, list]:
@@ -100,13 +77,8 @@ def get_article_links(docs: list) -> Union[list, list]:
 
 def format_response(llm_response: dict) -> dict:
     """"""
-    # llm_response = qa_chain(user_query)
-    # doc_names, doc_contents = get_doc_content(llm_response["source_documents"])
     article_links, article_names = get_article_links(llm_response["source_documents"])
 
-    # return {"answer": llm_response["result"],
-    #         "doc_names": doc_names,
-    #         "doc_contents": doc_contents}
     return {
         "answer": llm_response["result"],
         "article_links": article_links,

@@ -1,6 +1,7 @@
 import chainlit as cl
 from functions import format_response, qa_chain
-from prompt_testing import test_response
+
+# from prompt_testing import test_response
 
 
 @cl.on_chat_start
@@ -13,20 +14,15 @@ async def init():
 
 @cl.on_message  # this function will be called every time a user inputs a message in the UI
 async def main(message: str):
-    # chain = cl.user_session.get("chain")
-    # cb = cl.AsyncLangchainCallbackHandler(
-    #     stream_final_answer=True #, answer_prefix_tokens=["FINAL", "ANSWER"]
-    # )
-    # cb.answer_reached = True
-    # res = await chain.acall(message, callbacks=[cb])
-    res = format_response(test_response)
-
-    # print(len(res['doc_names']), len(res['doc_contents']))
+    chain = cl.user_session.get("chain")
+    response = await chain.acall(message)
+    response = format_response(response)
+    # response = format_response(test_response)
 
     await cl.Message(
         author="Retriever",
-        content=res["article_names"],
-        elements=res["article_links"],
+        content=response["article_names"],
+        elements=response["article_links"],
         indent=1,
     ).send()
-    await cl.Message(content=res["answer"], indent=0).send()
+    await cl.Message(content=response["answer"], indent=0).send()
