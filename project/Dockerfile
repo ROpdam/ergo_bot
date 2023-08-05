@@ -2,6 +2,8 @@ FROM python:3.10-slim-bullseye
 
 LABEL maintainer "Robin Opdam, robinopdam@hotmail.com"
 
+ENV DB_LOCATION = db_faiss
+
 # update the package lists for upgrades for packages that need upgrading
 RUN apt-get update -y
 
@@ -18,10 +20,6 @@ RUN pip install -r /requirements.txt
 
 # Copy app folder to app folder in container
 COPY /app /usr/src/app/
-
-# Changing to non-root user
-# RUN useradd -m appUser
-# USER appUser
 
 # Expose port for app usage
 EXPOSE 8000

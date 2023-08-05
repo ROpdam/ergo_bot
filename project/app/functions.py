@@ -7,7 +7,7 @@ from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 
 prompt_template = """Use the following pieces of context to answer
 the question at the end. If you don't know the answer, just
@@ -24,16 +24,13 @@ chain_type_kwargs = {"prompt": PROMPT}
 k = 3
 
 load_dotenv()
-db_persist_directory = os.getenv("DB_LOCATION")
-print(db_persist_directory)
+db_location = os.getenv("DB_LOCATION")
 
 # OpenAI embeddings
 embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-vectordb = Chroma(
-    persist_directory=db_persist_directory, embedding_function=embedding_function
-)
-retriever = vectordb.as_retriever(search_type="similarity", search_kwargs={"k": k})
+vectordb = FAISS.load_local(db_location, embedding_function)
+retriever = vectordb.as_retriever(search_kwargs={"k": k})
 
 qa_chain = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"),
