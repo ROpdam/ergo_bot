@@ -1,3 +1,4 @@
+import os
 from typing import Union
 
 import chainlit as cl
@@ -5,44 +6,26 @@ from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-
-# from langchain.embeddings import OpenAIEmbeddings
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain.prompts import PromptTemplate
 from langchain.vectorstores import Chroma
 
-system_template = """You are the ergolog chatbot. Use the
-following pieces of context to answer the users question.
-If you don't know the answer, just say that you don't know,
-don't try to make up an answer.
-ALWAYS return a "SOURCES" part in your answer.
-The "SOURCES" part should be a reference to the source of
-the document from which you got your answer.
+prompt_template = """Use the following pieces of context to answer
+the question at the end. If you don't know the answer, just
+say that you don't know, don't try to make up an answer.
 
-Example of your response should be:
+{context}
 
-```
-The answer is foo
-SOURCES: xyz
-```
+Question: {question}
+Answer using bullet points:"""
+PROMPT = PromptTemplate(
+    template=prompt_template, input_variables=["context", "question"]
+)
+chain_type_kwargs = {"prompt": PROMPT}
+k = 3
 
-Begin!
-----------------
-{summaries}"""
-
-messages = [
-    SystemMessagePromptTemplate.from_template(system_template),
-    HumanMessagePromptTemplate.from_template("{question}"),
-]
-prompt = ChatPromptTemplate.from_messages(messages)
-chain_type_kwargs = {"prompt": prompt}
-
-k = 4
-db_persist_directory = "ergologs_data/db"
 load_dotenv()
+db_persist_directory = os.getenv("DB_LOCATION")
+print(db_persist_directory)
 
 # OpenAI embeddings
 embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -50,7 +33,7 @@ embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"
 vectordb = Chroma(
     persist_directory=db_persist_directory, embedding_function=embedding_function
 )
-retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": k})
+retriever = vectordb.as_retriever(search_type="similarity", search_kwargs={"k": k})
 
 qa_chain = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"),
@@ -58,7 +41,7 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=retriever,
     return_source_documents=True,
     verbose=False,
-    # chain_type_kwargs=chain_type_kwargs
+    chain_type_kwargs=chain_type_kwargs,
 )
 
 
