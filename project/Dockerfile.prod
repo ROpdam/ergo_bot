@@ -1,0 +1,32 @@
+# Use a named build stage to install build dependencies and Python libraries
+FROM python:3.10-slim-bullseye AS build
+
+LABEL maintainer="Robin Opdam, robinopdam@hotmail.com"
+
+# Update packages and install build-essential in a single step to reduce layers
+RUN apt-get update -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and install Python dependencies
+COPY requirements.txt /
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /requirements.txt
+
+# Begin the final image
+FROM python:3.10-slim-bullseye
+
+# Copy over the Python environment from the build image
+COPY --from=build /usr/local /usr/local
+
+# Set environment variables and working directory
+ENV DB_LOCATION=db_faiss_OAI HOST=0.0.0.0 LISTEN_PORT=8000
+WORKDIR /usr/src/app
+
+# Copy the app files
+COPY /app /usr/src/app/
+
+# Expose the application's port
+EXPOSE 8000
+
+CMD ["chainlit", "run", "app.py"]

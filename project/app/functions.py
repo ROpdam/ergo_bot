@@ -5,7 +5,9 @@ import chainlit as cl
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
+
+# from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores import FAISS
 
@@ -27,7 +29,8 @@ load_dotenv()
 db_location = os.getenv("DB_LOCATION")
 
 # OpenAI embeddings
-embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+# embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+embedding_function = OpenAIEmbeddings()
 
 vectordb = FAISS.load_local(db_location, embedding_function)
 retriever = vectordb.as_retriever(search_kwargs={"k": k})
