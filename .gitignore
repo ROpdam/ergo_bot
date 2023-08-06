@@ -1,6 +1,6 @@
 __pycache__/
 
 *.env
-*db_faiss
+*db_faiss_OAI
 *.ipynb_checkpoints
 TODO.txt
