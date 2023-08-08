@@ -72,6 +72,6 @@ jobs:
         image: ${{ env.IMAGE_NAME }}:latest
         region: europe-west4
         service: ergobot
-        flags: --port=8080 --allow-unauthenticated
+        flags: --port=8000 --allow-unauthenticated
     - name: Clean up old images
       run: gcloud artifacts docker images list-tags ${{ env.IMAGE_NAME }} --filter='-tags:*' --format="get(digest)" --limit=10 > tags && while read p; do gcloud artifacts docker images delete "${{ env.IMAGE_NAME }}@$p" --quiet; done < tags

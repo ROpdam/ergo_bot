@@ -7,8 +7,27 @@ from functions import format_response, qa_chain
 @cl.on_chat_start
 async def init():
     """"""
+    elements = [
+        cl.Text(
+            name="Example Questions",
+            content="""
+    Is ginger healthy? Why?
+    \n---
+    How to improve endurance?
+    \n---
+    What are health benefits of green tea and why?
+    \n---
+    Why do athletes eat bananas?
+    \n---
+    How to gain muscle mass?
+    \n---
+    """,
+        )
+    ]
+
     await cl.Message(
-        content="Hi! I am the [Ergolog](https://www.ergo-log.com/) chatbot how can I help?"
+        content="""Hi! I am the [Ergolog](https://www.ergo-log.com/) assistant how can I help? (Example Questions)""",
+        elements=elements,
     ).send()
 
     cl.user_session.set("chain", qa_chain)
