@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout master
         uses: actions/checkout@v3
+        with:
+            lfs: true
       - name: Log in to Github Packages
         run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
         env:
@@ -43,6 +45,8 @@ jobs:
     steps:
     - name: Checkout master
       uses: actions/checkout@v3
+      with:
+        lfs: true
     - name: Log in to Github Packages
       run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
       env:
