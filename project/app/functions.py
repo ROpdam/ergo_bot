@@ -23,7 +23,7 @@ PROMPT = PromptTemplate(
     template=prompt_template, input_variables=["context", "question"]
 )
 chain_type_kwargs = {"prompt": PROMPT}
-k = 3
+k = 5
 
 load_dotenv()
 db_location = os.getenv("DB_LOCATION")
