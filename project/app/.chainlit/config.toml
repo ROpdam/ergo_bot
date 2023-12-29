@@ -27,7 +27,7 @@ session_timeout = 3600
 name = "Ergobot"
 
 # Description of the app and chatbot. This is used for HTML tags.
-# description = ""
+description = "Your ergogenic chatbot"
 
 # The default value for the expand messages settings.
 default_expand_messages = false
