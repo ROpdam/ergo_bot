@@ -1,5 +1,5 @@
 import chainlit as cl
-from functions import format_response, qa_chain
+from functions import create_qa_chain, format_response
 
 # from prompt_testing import test_response
 
@@ -30,7 +30,7 @@ async def init():
         elements=elements,
     ).send()
 
-    cl.user_session.set("chain", qa_chain)
+    cl.user_session.set("chain", create_qa_chain())
 
 
 @cl.on_message  # this function will be called every time a user inputs a message in the UI
